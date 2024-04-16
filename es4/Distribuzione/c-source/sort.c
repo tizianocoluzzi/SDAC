@@ -4,6 +4,7 @@
 
 
 #include "sort.h"
+
 void merge(array* a, int i, int m ,int f){
     array* app = (array*) malloc(sizeof(array));
     app->size = f-i+1;
@@ -58,8 +59,7 @@ void mergeSort(array *a) {
 
 
 void heapSort(array *a) {
-    fprintf(stdout, "heapSort currently not implemented.\n");
-    return;
+    //non implemento l'heap sort poichè presente nelle successive esercitazioni
 }
 
 void infila(array* a, int elem, int i){

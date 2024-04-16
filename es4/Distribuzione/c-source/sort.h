@@ -6,7 +6,7 @@ typedef struct {
     int size;
 } array;
 
-void swap(int *, int *);
+void swap(int* a, int j, int k);
 void sortAlgCaller(void (*sort_alg)(array*), array *a);
 int nextInt(int max);
 
