@@ -134,17 +134,56 @@ void graph_delete(graph * g) {
 
 graph* graph_read_ff(FILE* input) {
 	graph * g = graph_new();
-	char str[3];
-	while(fgets(str, 3, input)){
-		//il problema è che se faccio la malloc non puntano allo stesso indirizzo
-		//probabilmente devo verificare se il valore è gia presente
-		//assumo quindi che il valore sia unico
-		printf("%s", str);
+	graph_node** arr;
+	int n;
+	int m;
+	fscanf(input,"%d%d\n", &n, &m);
+	printf("nodi: %d  archi: %d\n", n, m);
+	//creo n nodi
+	arr = (graph_node**) malloc(n*sizeof(graph_node*));
+	for(int i = 0; i < n; i++){
+		int *j =(int*) malloc(sizeof(int));
+		*j = i + 49;
+		arr[i] = graph_add_node(g, (void*) j);
+	}
+	int n1;
+	int n2;
+	for(int i = 0; i < m; i++){
+		fscanf(input, "%d%d", &n1, &n2);
+		graph_add_edge(g, arr[n1-1], arr[n2-1]);
 	}
 	return g;
 }
 
 void graph_print(graph* g) {
+	if(g != NULL && g->nodes != NULL){
+		linked_list_node* a = g->nodes->head;
+		while(a != NULL){
+			if(a->value != NULL && ((graph_node*)a->value)->out_edges != NULL){
+				linked_list_node* b = ((graph_node*)a->value)->out_edges->head;
+				while(b != NULL){
+					graph_node* node = (graph_node*) b->value;
+					if(node->state == EXPLORED){}
+					else {
+						printf("%c %c\n", *(char*)graph_get_node_value((graph_node*)a->value), *(char*)graph_get_node_value((graph_node*)b->value));
+					}
+					//node->state = EXPLORED;
+					b = b->next;
+				}
+				((graph_node*)(a->value))->state = EXPLORED;
+			}
+			a = a->next;
+		}
+		a = g->nodes->head;
+		//resetto tutto a UNEXPLRED
+		while(a != NULL){
+			((graph_node*)(a->value))->state = UNEXPLORED;
+			a = a->next;
+		}
+	}
+}
+
+void graph_print_adj(graph* g) {
 	if(g != NULL && g->nodes != NULL){
 		linked_list_node* a = g->nodes->head;
 		while(a != NULL){
@@ -165,16 +204,101 @@ void graph_print(graph* g) {
 	}
 }
 
-void graph_print_adj(graph* g) {
-	//rappresentazione ad archi, brutale
-	printf("rappresentazione ad archi non implementata\n");
+// per resettare l'albero ai valori di default, probabilmente è concettualmente sbagliato
+
+void reset(graph* g){
+	if(g->nodes != NULL) return;
+	linked_list_node* n = g->nodes->head;
+	while(n != NULL){
+		((graph_node*)n->value)->state = UNEXPLORED;
+		((graph_node*)n->value)->timestamp = 0;
+		n = n->next;
+	}
+}
+
+int DFS_n_comp(graph* g, graph_node *gn){
+	//printf("esploro: %c\n", *(char*)gn->value);
+	if(gn->state == EXPLORED) return 0;
+	if(gn->state == EXPLORING) return 0;
+	gn->state = EXPLORING;
+	if(gn->out_edges != NULL){
+		linked_list_node* n = gn->out_edges->head;
+		while(n != NULL){
+			DFS_n_comp(g, (graph_node*)n->value);
+			n = n->next;
+		}
+	}
+	gn->state = EXPLORED;
+	return 1;
+}
+
+int graph_n_con_comp(graph * g) {
+	int k = 0;
+	if(g != NULL && g->nodes != NULL){
+		linked_list_node* n = g->nodes->head;
+		while(n != NULL){
+			graph_node* gn = (graph_node*)(n->value);
+			k+= DFS_n_comp(g, gn);
+			n = n->next;
+		}
+	}
+	return k;
 }
 
 
-int graph_n_con_comp(graph * g) {
-	return 0;
+
+//impostare un timestamp diverso ogni volta che si incontra una nuova componente
+//glob è il conto di quante componenti connnesse abbiamo
+//se t è diverso da zero significa che la funzione è stat chiamata da un nodo che aveva un timestamp pari a t
+
+//TODO N.B. la struttura è similie a quella scritta al momento ma avevo mal interpretato l'output
+//modifche da fare:
+//                  la funzione DFS_get_con_comp deve ritornare un albero
+//				 	la funzione deve creare mano mano l'albero, quindi va passato come parametro
+//					se non esiste lo crea e lo passa ai nodi connessi
+void DFS_get_con_comp(graph* g, graph_node* gn, int t, int glob){
+	if(gn->state == EXPLORED) return;
+	if(gn->state == EXPLORING) return;
+	gn->state = EXPLORING;
+	if(gn->timestamp == 0){
+		if(t == 0){
+			gn->timestamp = glob;
+			glob++;
+		}
+		else{
+			gn->timestamp = t;
+		}
+		if(gn->out_edges != NULL){
+			linked_list_node* n = gn->out_edges->head;
+			while(n != NULL){
+				DFS_get_con_comp(g, (graph_node*)n->value, gn->timestamp, glob);
+				n = n->next;
+			}
+		}
+	} 
+	gn->state = EXPLORED;
+	return;
+	
 }
 
 linked_list* graph_get_con_comp(graph* g) {
+	linked_list* ll = linked_list_new();
+	int num = graph_n_con_comp(g);
+	linked_list** l = (linked_list**) calloc(num, sizeof(linked_list*));
+	reset(g); //reset del grafo in modo da esssere sicuro che sia impostato ai valori di default
+	if(g != NULL && g->nodes != NULL){
+		linked_list_node* n = g->nodes->head;
+		while(n != NULL){
+			graph_node* gn = (graph_node*)(n->value);
+			DFS_get_con_comp(g, gn, 0, 1);
+			n = n->next;
+		}
+		n = g->nodes->head;
+		while(n != NULL){
+			graph_node* gn = (graph_node*)(n->value);
+			linked_list_add(l[gn->timestamp-1], gn->value);
+			n = n->next;
+		}
+	}
 	return NULL;
 }
