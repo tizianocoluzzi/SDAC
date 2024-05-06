@@ -26,6 +26,6 @@ public	class Edge<V> {
     }
 
     public String toString() {
-        return target.toString() + "[peso=" + weight + "]";
+        return source.toString() + " " + target.toString() + "[peso=" + weight + "]";
     }
 }

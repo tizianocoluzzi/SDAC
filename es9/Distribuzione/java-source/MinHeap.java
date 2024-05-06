@@ -9,6 +9,19 @@ public class MinHeap<V> {
         a.add(null); // per un indirizzamento più naturale (radice -> a.get(1))
     }
     
+    public HeapEntry<V> get(V value){
+        ListIterator<HeapEntry<V>> it = a.listIterator();
+        while(it.hasNext()){
+            HeapEntry<V> e = it.next();
+            if(e!=null){
+                if(e.getValue() == value){
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
+
     public HeapEntry<V> getMin() { 
         if(isEmpty()) return null; 
         return a.get(1); 
@@ -104,6 +117,7 @@ public class MinHeap<V> {
     public HeapEntry<V> replaceKey(HeapEntry<V> e, int key) {
         int oldKey = e.getKey(); 
         e.setKey(key); 
+        if(key == oldKey) return e;
         if(key < oldKey) upheap(e); 
         else downheap(e); 
         return e; 
