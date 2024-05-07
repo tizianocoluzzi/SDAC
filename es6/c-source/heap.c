@@ -62,21 +62,33 @@ int heap_size(heap * hh) {
 	return hh->used;
 }
 
+
+//TODO non è esatta perche in realta non si assicura che finisca veramente 
+//all'ultima posizione
 int heap_poll(heap * hh) {
 	int key = hh->array[0]->key;
 	//printf("poll %d", key);
 	int idx;
 	if(hh->is_min_heap){
 		idx = increase_key(hh, hh->array[0], MAX);
+		if(idx < hh->used-1){
+			swap_elements(hh, idx+1, idx);
+			idx = idx+1;
+			
+		}
 		hh->used--; 
 	}
 	else{
 		idx = decrease_key(hh, hh->array[0], MIN);
+		if(idx < hh->used-1){
+			swap_elements(hh, idx+1, idx);
+			idx = idx+1;
+		}
 		hh->used--; 
 	}
 	//riassegno la chiave perche è comodo poi per l'heapSort
 	hh->array[idx]->key = key;
-	return 0;
+	return key;
 }
 
 void heap_delete(heap * hh) {
@@ -172,7 +184,7 @@ int increase_key(heap* hh, heap_entry *ee, int key){
 	}
 	int idx;
 	int r = rigth(i); int l = left(i);
-	while(i < hh->used && l<=hh->used ){
+	while(i < hh->used && r<=hh->used ){
 		if(hh->array[l]->key < key) idx = l;
 		else idx = i;
 		if(r < hh->used && hh->array[r]->key < hh->array[idx]->key) idx = r;
