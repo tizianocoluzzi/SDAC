@@ -78,7 +78,9 @@ public abstract class AbstractHashTable {
         capacity = newCap;
         Iterable<Entry> ll = entrySet();
         createTable();
+        n = 0;
         for(Entry e: ll){
+            if( e == null) continue;
             put(e.getKey(), e.getValue());
         }
         return;
@@ -123,6 +125,7 @@ public abstract class AbstractHashTable {
     public void print() {
         String print = "[";
         for(Entry e : entrySet()){
+            if(e == null) continue;
             print += e.toString() + ",";
         }
         print += "]";

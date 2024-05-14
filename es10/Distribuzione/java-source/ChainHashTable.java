@@ -60,9 +60,9 @@ public class ChainHashTable extends AbstractHashTable {
     public int put(String k, int value) {
         int idx = this.hashFunction(k);
         int val = -1;
-        // if((size() + 1 ) / getCapacity() > getMaxLambda()){
-        //     resize(getCapacity() * 2);
-        // }
+        if((double)(size() + 1 ) / getCapacity() >= getMaxLambda()){
+             resize(getCapacity() * 2);
+         }
         try{
             for(Entry n : table[idx]){
                 if(n.getKey() == k){
