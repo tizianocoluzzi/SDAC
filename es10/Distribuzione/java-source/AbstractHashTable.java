@@ -38,6 +38,7 @@ public abstract class AbstractHashTable {
     
     /* Costruttori di AbstractHashTable */
     public AbstractHashTable(int cap, int p, double lambda) {
+        n = 0;
         capacity = cap;
         prime = p;
         maxLambda = lambda;
@@ -64,11 +65,22 @@ public abstract class AbstractHashTable {
     // metodo che implementa la funzione hash (hash code + compressione)
     // si ricordi che ogni oggetto Java implementa hashcode, a cominciare dalle stringhe
     protected int hashFunction(String k) { 
-        return 	0;
+        int num = Math.abs(k.hashCode());
+        //System.out.println(a + " " + b + " " + prime + " " + capacity + "  " + num);
+        long ret = ((a*num + b) % prime)%capacity;
+        return 	(int) ret;
     }
     
     // metodo che aggiorna la dimensione della tabella hash
     protected void resize(int newCap) { 	
+        //utilizzando la resize va ripopolata la tabella 
+        System.out.println("chiamata resize");
+        capacity = newCap;
+        Iterable<Entry> ll = entrySet();
+        createTable();
+        for(Entry e: ll){
+            put(e.getKey(), e.getValue());
+        }
         return;
     }
     
@@ -76,38 +88,45 @@ public abstract class AbstractHashTable {
     
     // restituisce true se la tabella è vuota
     public boolean isEmpty() {
-        return false;
+        return  (n == 0) ? true : false;
     }
     
     // restituisce il numero di chiavi presenti nella tabella
     public int size() { 
-        return 0;
+        return n;
     }
     
     // restituisce la capacità della tabella
     public int getCapacity() { 
-        return 0;
+        return capacity;
     }
     
     // incrementa il numero n di chiavi presenti
     public void incSize() { 
+        n++;
         return;
     }
     
     // decrementa il numero n di chiavi presenti
     public void decSize() { 
+        n--;
         return;
     }
     
     // restituisce valore max. per il fattore di carico (si effettua resize se superato)
     public double getMaxLambda() { 
-        return 0.0;
+        return maxLambda;
     }
     
     // stampa una rappresentazione delle coppie presenti secondo
     // il formato [(k1, v1), (k2,v2), ..., (kn, vn)]
     public void print() {
-        System.out.println("[]");
+        String print = "[";
+        for(Entry e : entrySet()){
+            print += e.toString() + ",";
+        }
+        print += "]";
+        System.out.println(print);
     }
     
     /* Metodi astratti da implementare nelle sottoclassi */

@@ -1,6 +1,10 @@
 import java.util.LinkedList;
 
 public class OpenHashTable extends AbstractHashTable {
+    // in teoria la scansione quadratica prevede la seguente formula per la sequenza di hash code
+    // h(k, i) = (h'(k) + c1*i + c2 *i^2) mod m
+    // con c1 e c2 coefficienti
+    // m è l'indice massimo, quindi in teoria getSize()
     // Un array di Entry per la tabella
     private Entry[] table;
     // Marcatore di cella vuota ma da esaminare durante probing
