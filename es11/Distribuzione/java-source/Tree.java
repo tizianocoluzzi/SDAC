@@ -67,11 +67,37 @@ public class Tree {
         return n6;
     }
 
+    private boolean isBSTRec(Tree c){
+        if(c == null) return true; 
+        if(c.left == null && c.right == null) return true;
+        if(c.left == null && c.right.key < key ) return false;
+        else if(c.right == null && c.left.key > key) return false;
+        if(c.left.key > c.key || c.right.key < c.key) return false;
+        else return isBSTRec(c.left) && isBSTRec(c.right);
+    }
+
     public boolean isBST() {
-        return true;
+        return isBSTRec(this);
+    }
+
+    private int max(int a, int b){
+        if(a < b) return b;
+        else return a;
+
+    }
+
+    private int isBalancedRec(Tree c){
+        if(c == null) return 0;
+        if(c.left == null && c.right == null) return 1;
+        int isL = isBalancedRec(c.left);
+        int isR = isBalancedRec(c.right);
+        if(isL == -1 || isR == -1) return -1;
+        if(Math.abs(isL - isR) <= 1) return 1 + max(isL, isR);
+        return -1;
     }
 
     public boolean isBalanced() {
+        if(isBalancedRec(this) == -1) return false;
         return true;
     }
 
