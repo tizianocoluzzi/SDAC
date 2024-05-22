@@ -82,7 +82,6 @@ public class Driver {
                 System.out.print("L'albero 2 non è effettivamente un BST. OK.\n");
             else
                 System.out.print("L'albero 2 NON è un BST ma viene riconosciuto come tale. KO.\n");
-
         } else if (argv[0].equals("balanced")) {
 
             Tree t = Tree.build_1();

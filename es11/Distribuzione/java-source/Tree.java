@@ -72,6 +72,7 @@ public class Tree {
         if(c.left == null && c.right == null) return true;
         if(c.left == null && c.right.key < key ) return false;
         else if(c.right == null && c.left.key > key) return false;
+        if(c.right == null || c.left == null) return true;
         if(c.left.key > c.key || c.right.key < c.key) return false;
         else return isBSTRec(c.left) && isBSTRec(c.right);
     }
@@ -101,7 +102,30 @@ public class Tree {
         return true;
     }
 
+
+    //disclaimer per me stesso, probabilmente è scritto di merda
+    public int isAVLRec(Tree c){
+        //casi base generici(sia balanced ceh bst)
+        if(c == null) return 0;
+        if(c.left == null && c.right == null) return 1;
+        //controllo se i sottoalberi sono avl
+        int isL = isAVLRec(c.left);
+        int isR = isAVLRec(c.right);
+        if(isL == -1 || isR == -1) return -1;
+        //controllo se sono BST
+        if(c.left == null && c.right.key < key ) return -1; 
+        else if(c.right == null && c.left.key > key) return -1;
+        if(c.right == null || c.left == null) //in questo caso è necessariamente bilanciato ma non necessariamente avl
+        {
+            if(Math.abs(isL - isR) <= 1) return 1 + max(isL, isR);
+        }
+        else if(c.left.key > c.key || c.right.key < c.key) return -1;
+        else if(Math.abs(isL - isR) <= 1) return 1 + max(isL, isR);
+        return -1;
+    }
+
     public boolean isAVL() {
+        if(isAVLRec(this) == -1) return false; 
         return true;
     }
 
