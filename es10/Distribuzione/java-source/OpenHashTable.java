@@ -66,8 +66,7 @@ public class OpenHashTable extends AbstractHashTable {
         int app = -1;
         //System.out.println("capacity: " + getCapacity());
         if( (double)((size() + 1) / getCapacity()) >= getMaxLambda()){
-            resize(getCapacity()*2 + 1); //per mantenerlo dispari, secondo un teorema se è primo
-                                         //dovrei aver garantito che non si ripetano gli indici
+            resize(Prime.nextPrime(getCapacity()*2 + 1)); 
         }
         //System.out.println("chiamata put per k: " + k + " v: " + value );
         while(true){
